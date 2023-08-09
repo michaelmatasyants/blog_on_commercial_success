@@ -66,7 +66,7 @@ def post_detail(request, slug):
         'tags': [serialize_tag(tag) for tag in related_tags],
     }
 
-    most_popular_tags = Tag.objects.annotate(num_tags='posts').order_by('-num_tags')[:5]
+    most_popular_tags = Tag.objects.annotate(num_tags=Count('posts')).order_by('-num_tags')[:5]
     most_popular_posts = Post.objects.annotate(num_likes=Count('likes')).order_by('-num_likes')[:5]
 
     context = {
