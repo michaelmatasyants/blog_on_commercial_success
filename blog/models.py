@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Count
 from django.urls import reverse
 from django.contrib.auth.models import User
 
@@ -11,7 +12,7 @@ class PostQuerySet(models.QuerySet):
         return postst_at_year
 
     def popular(self):
-        popular_posts = self.annotate(likes_count=models.Count('likes')
+        popular_posts = self.annotate(likes_count=Count('likes')
                                       ).order_by('-likes_count')
         return popular_posts
 
@@ -19,8 +20,9 @@ class PostQuerySet(models.QuerySet):
         """Adds comments_count to Post and returns list with Post objects"""
         post_ids = [post.id for post in self]
         posts_with_comments = Post.objects.filter(id__in=post_ids).annotate(
-            comments_count=models.Count('comments'))
-        count_for_id = dict(posts_with_comments.values_list('id', 'comments_count'))
+            comments_count=Count('comments'))
+        count_for_id = dict(posts_with_comments.values_list(
+                                'id', 'comments_count'))
         for post in self:
             post.comments_count = count_for_id[post.id]
         return list(self)
@@ -64,8 +66,8 @@ class Post(models.Model):
 class TagQuerySet(models.QuerySet):
 
     def popular(self):
-        popular_tags = self.annotate(tags_count=models.Count('posts')
-                                     ).order_by('-tags_count')
+        popular_tags = self.annotate(posts_count=Count('posts')
+                                     ).order_by('-posts_count')
         return popular_tags
 
 
