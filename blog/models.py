@@ -6,8 +6,24 @@ from django.contrib.auth.models import User
 class PostQuerySet(models.QuerySet):
 
     def year(self, year):
-        postst_at_year = self.filter(published_at__year=year).order_by('published_at')
+        postst_at_year = self.filter(published_at__year=year
+                                     ).order_by('published_at')
         return postst_at_year
+
+    def popular(self):
+        popular_posts = self.annotate(likes_count=models.Count('likes')
+                                      ).order_by('-likes_count')
+        return popular_posts
+
+    def fetch_with_comments_count(self):
+        """Adds comments_count to Post and returns list with Post objects"""
+        post_ids = [post.id for post in self]
+        posts_with_comments = self.filter(id__in=post_ids).annotate(
+            comments_count=models.Count('comments'))
+        count_for_id = dict(posts_with_comments.values_list('id', 'comments_count'))
+        for post in self:
+            post.comments_count = count_for_id[post.id]
+        return list(self)
 
 
 class Post(models.Model):
@@ -48,8 +64,8 @@ class Post(models.Model):
 class TagQuerySet(models.QuerySet):
 
     def popular(self):
-        popular_tags = self.annotate(num_tags=models.Count('posts')
-                                     ).order_by('-num_tags')
+        popular_tags = self.annotate(tags_count=models.Count('posts')
+                                     ).order_by('-tags_count')
         return popular_tags
 
 
