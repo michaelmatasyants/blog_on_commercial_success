@@ -18,7 +18,7 @@ class PostQuerySet(models.QuerySet):
     def fetch_with_comments_count(self):
         """Adds comments_count to Post and returns list with Post objects"""
         post_ids = [post.id for post in self]
-        posts_with_comments = self.filter(id__in=post_ids).annotate(
+        posts_with_comments = Post.objects.filter(id__in=post_ids).annotate(
             comments_count=models.Count('comments'))
         count_for_id = dict(posts_with_comments.values_list('id', 'comments_count'))
         for post in self:
