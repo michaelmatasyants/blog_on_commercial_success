@@ -53,7 +53,7 @@ def index(request):
 
     most_fresh_posts = posts.annotate(comments_count=Count('comments')
                                       ).order_by('-published_at')[:5]
-    most_popular_tags = Tag.objects.annotate(num_tags=Count('posts')).order_by('-num_tags')[:5]
+    most_popular_tags = Tag.objects.popular()[:5]
 
     context = {
         'most_popular_posts': [
@@ -92,7 +92,7 @@ def post_detail(request, slug):
         'tags': [serialize_tag(tag) for tag in related_tags],
     }
 
-    most_popular_tags = Tag.objects.annotate(num_tags=Count('posts')).order_by('-num_tags')[:5]
+    most_popular_tags = Tag.objects.popular()[:5]
     most_popular_posts = Post.objects.annotate(likes_count=Count('likes')).order_by('-likes_count')[:5]
 
     context = {
@@ -107,7 +107,7 @@ def post_detail(request, slug):
 
 def tag_filter(request, tag_title):
     tag = Tag.objects.get(title=tag_title)
-    most_popular_tags = Tag.objects.annotate(num_tags=Count('posts')).order_by('-num_tags')[:5]
+    most_popular_tags = Tag.objects.popular()[:5]
     most_popular_posts = Post.objects.annotate(likes_count=Count('likes')).order_by('-likes_count')[:5]
 
     related_posts = tag.posts.all()[:20]
