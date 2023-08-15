@@ -7,9 +7,9 @@ from django.contrib.auth.models import User
 class PostQuerySet(models.QuerySet):
 
     def year(self, year):
-        postst_at_year = self.filter(published_at__year=year
+        posts_at_year = self.filter(published_at__year=year
                                      ).order_by('published_at')
-        return postst_at_year
+        return posts_at_year
 
     def popular(self):
         popular_posts = self.annotate(likes_count=Count('likes')
