@@ -49,7 +49,7 @@ def index(request):
 def post_detail(request, slug):
     posts_with_tags = Post.objects.fetch_tags()
     post = get_object_or_404(posts_with_tags, slug=slug)
-    comments = post.comments.prefetch_related('author')
+    comments = post.comments.select_related('author')
     serialized_comments = []
     for comment in comments:
         serialized_comments.append({
